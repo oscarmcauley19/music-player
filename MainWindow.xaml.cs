@@ -25,7 +25,6 @@ using ProjectDesign.Views;
 using System.Diagnostics;
 using Microsoft.Win32;
 using System.Windows.Controls.Primitives;
-using Genius;
 using ProjectDesign.com.wikia.lyrics;
 
 namespace ProjectDesign

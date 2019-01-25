@@ -15,7 +15,6 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using MusicApiCollection.Data;
 using MusicApiCollection;
-using Lastfm;
 using System.Net.Http;
 using System.Xml;
 using System.Text.RegularExpressions;
