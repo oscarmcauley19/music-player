@@ -71,7 +71,8 @@ namespace ProjectDesign
             List<SongChoice> smallList = new List<SongChoice>();
             foreach (string item in tempList)
             {
-                smallList.AddRange(this.GetList().FindAll(i => i.GetType().GetProperty(attribute).GetValue(i, null).ToString() == item));
+                smallList.AddRange(this.GetList().FindAll(i => i.GetType()
+                .GetProperty(attribute).GetValue(i, null).ToString() == item));
                 MergeSort.Sort(smallList, "Name");
                 newList.AddRange(smallList);
                 smallList.Clear();
