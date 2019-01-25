@@ -25,7 +25,6 @@ using ProjectDesign.Views;
 using System.Diagnostics;
 using Microsoft.Win32;
 using System.Windows.Controls.Primitives;
-using Genius;
 using ProjectDesign.com.wikia.lyrics;
 
 namespace ProjectDesign
@@ -394,15 +393,15 @@ namespace ProjectDesign
                         {
                             //Queue = Queue.OrderByDescending(n => n.Name).ToList();
                             //MergeSort(Queue, "Name");
-                            Queue.AlphabeticalSort("Name");
-                            Queue.Reverse();
+                            Queue.AlphabeticalSort("Name", false);
+                            //Queue.Reverse();
 
                         }
                         else
                         {
                             //Queue = Queue.OrderBy(n => n.Name).ToList();
                             //MergeSort(Queue, "Name");
-                            Queue.AlphabeticalSort("Name");
+                            Queue.AlphabeticalSort("Name", true);
                         }
                         break;
                     case " A L B U M":
@@ -410,14 +409,14 @@ namespace ProjectDesign
                         {
                             //Queue = Queue.OrderByDescending(a => a.Album).ToList();
                             //MergeSort(Queue, "Album");
-                            Queue.AlphabeticalSort("Album");
-                            Queue.Reverse();
+                            Queue.AlphabeticalSort("Album", false);
+                            //Queue.Reverse();
                         }
                         else
                         {
                             //Queue = Queue.OrderBy(a => a.Album).ToList();
                             //MergeSort(Queue, "Album");
-                            Queue.AlphabeticalSort("Album");
+                            Queue.AlphabeticalSort("Album", true);
                         }
                         break;
                     case " A R T I S T":
@@ -425,15 +424,14 @@ namespace ProjectDesign
                         {
                             //Queue = Queue.OrderByDescending(a => a.Artist).ToList();
                             //MergeSort(Queue, "Artist");
-                            Queue.AlphabeticalSort("Artist");
-                            Queue.Reverse();
+                            Queue.AlphabeticalSort("Artist", false);
+                            //Queue.Reverse();
                         }
                         else
                         {
                             //Queue = Queue.OrderBy(a => a.Artist).ToList();
                             //MergeSort(Queue, "Artist");
-                            Queue.AlphabeticalSort("Artist");
-                            Queue.Reverse();
+                            Queue.AlphabeticalSort("Artist", true);
                         }
                         break;
                     case " D U R A T I O N":

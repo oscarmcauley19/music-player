@@ -43,9 +43,42 @@ namespace ProjectDesign
             songs.Clear();
         }
 
-        public void AlphabeticalSort(string attribute)
+        public void AlphabeticalSort(string attribute, bool ascending)
         {
+            if (attribute == "Name")
+            {
+                MergeSort.Sort(songs, attribute);
+            }
+            
             MergeSort.Sort(songs, attribute);
+            List<SongChoice> newList = new List<SongChoice>();
+
+            List<string> tempList = new List<string>();
+            //tempList.AddRange(this);
+            foreach (SongChoice song in this.GetList())
+            {
+                var result = song.GetType().GetProperty(attribute).GetValue(song, null);
+                if (!tempList.Contains(result.ToString()))
+                {
+                    tempList.Add(result.ToString());
+                }
+            }
+            if (!ascending)
+            {
+                tempList.Reverse();
+            }
+
+            List<SongChoice> smallList = new List<SongChoice>();
+            foreach (string item in tempList)
+            {
+                smallList.AddRange(this.GetList().FindAll(i => i.GetType().GetProperty(attribute).GetValue(i, null).ToString() == item));
+                MergeSort.Sort(smallList, "Name");
+                newList.AddRange(smallList);
+                smallList.Clear();
+            }
+            songs.Clear();
+            songs.AddRange(newList);
+            //songs = songs.OrderBy(a => a.Artist).ToList();      
         }
 
         public void Shuffle()
