@@ -1,0 +1,63 @@
+﻿<Window x:Class="ProjectDesign.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ProjectDesign"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="350" Width="525">
+    
+    <Window.Resources>
+        <CollectionViewSource x:Key="ItemCollectionViewSource" CollectionViewType="ListCollectionView"/>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="100" />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Background="#FF838383" Grid.Column="0">
+            <Slider x:Name="slider" Width="70" Background="{x:Null}" Foreground="#FF4F4F4F" VerticalAlignment="Center" Margin="0,10,0,10"/>
+            <TextBlock MaxWidth="68" MaxHeight="50" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" Height="40" Margin="0,0,0,5" VerticalAlignment="Bottom" Width="68" FontFamily="Segoe UI Light" FontSize="14" MouseDown="filesClicked"><Run Text="Choose Files..."/>
+            </TextBlock>
+        </StackPanel>
+
+        <Grid Background="#212121" Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="70" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
+
+                <TextBlock Grid.Column="0" Text="S O N G S" HorizontalAlignment="Center" Margin="18" FontSize="30" Foreground="White" />
+
+                <Button Grid.Column="1" Content="SHUFFLE" Width="60" Margin="0 28 0 20" HorizontalAlignment="Left"/>
+
+            </StackPanel>
+
+            <DataGrid DataContext="{StaticResource ItemCollectionViewSource}" ItemsSource="{Binding}" x:Name="songGrid" AutoGenerateColumns="False" CanUserAddRows="False" Grid.Row="1" Margin="20,0,20,60" Background="Transparent">
+
+                <DataGrid.Resources>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Foreground" Value="White" />
+                        <Setter Property="HorizontalAlignment" Value="Left" />
+
+                    </Style>
+                </DataGrid.Resources>
+
+                <DataGrid.Columns>
+                    <DataGridTextColumn Binding="{Binding Path=Name}" Header="Title" FontWeight="Bold" />
+                    <DataGridTextColumn Binding="{Binding Path=Artist}" Header="Artist" FontWeight="Bold" />
+                    <DataGridTextColumn Binding="{Binding Path=Album}" Header="Album" FontWeight="Bold" />
+                    <DataGridTextColumn Binding="{Binding Path=Length}" Header="Duration" FontWeight="Bold" />
+                </DataGrid.Columns>
+                
+
+            </DataGrid>
+            
+        </Grid>
+
+    </Grid>
+</Window>

@@ -1,0 +1,51 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="ProjectDesign.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="DBConnectionString" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">SERVER=mcauleyhouse.ddns.net;PORT=32004;DATABASE=user_database;UID=oscar;pwd=Hunt3l44R;SslMode=none;</Value>
+    </Setting>
+    <Setting Name="FTPAddress" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">ftp://mcauleyhouse.ddns.net:32005/oscar/music</Value>
+    </Setting>
+    <Setting Name="Top" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">20</Value>
+    </Setting>
+    <Setting Name="Left" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">20</Value>
+    </Setting>
+    <Setting Name="Height" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">600</Value>
+    </Setting>
+    <Setting Name="Width" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">800</Value>
+    </Setting>
+    <Setting Name="Maximized" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="UploadAddress" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">\\mcauleyhouse.ddns.net\oscar\music</Value>
+    </Setting>
+    <Setting Name="FTPUsername" Type="System.String" Scope="User">
+      <Value Profile="(Default)">oscar</Value>
+    </Setting>
+    <Setting Name="FTPPassword" Type="System.String" Scope="User">
+      <Value Profile="(Default)">booboo</Value>
+    </Setting>
+    <Setting Name="UserName" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="DefaultPath" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="UserID" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">-1</Value>
+    </Setting>
+    <Setting Name="RememberUser" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="ProjectDesign_com_wikia_lyrics_LyricWiki" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://lyrics.wikia.com/server.php</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

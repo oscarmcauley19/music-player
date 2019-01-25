@@ -1,0 +1,48 @@
+﻿<Page x:Class="ProjectDesign.SignUpPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:ProjectDesign"
+      mc:Ignorable="d" 
+      d:DesignHeight="300" d:DesignWidth="300"
+      Title="SignUpPage">
+
+    <Grid Background="#FF1B1B1B">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="30"/>
+
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Text="L O G I N" FontFamily="Segoe UI Light" Foreground="White" FontSize="25" Margin="20, 10"/>
+            <TextBlock Grid.Row="1" Text="Enter your account details below:" FontFamily="Segoe UI Light" Foreground="White" Margin="20, 0, 0, 0"/>
+            <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="20, 0, 0, 20">
+                <TextBlock Text="Username:"  FontFamily="Segoe UI Light" Foreground="White" Width="70"/>
+                <TextBox Name="UsernameInput" Margin="0, 0, 20, 0" Width="200" ToolTip="Must be minimum 3 characters, maximum 12 characters" Height="20" HorizontalAlignment="Left"/>
+            </StackPanel>
+            <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="20, 0, 0, 20">
+                <TextBlock Text="Password:" FontFamily="Segoe UI Light" Foreground="White" Width="70"/>
+                <PasswordBox Name="PasswordInput" Width="200" ToolTip="Must be between 8 and 15 characters and contain at least 1 number" HorizontalAlignment="Left"/>
+            </StackPanel>
+            <StackPanel Grid.Row="4" Orientation="Horizontal" Margin="20, 0, 0, 20">
+                <TextBlock Text="Repeat Password:" FontFamily="Segoe UI Light" Foreground="White" TextWrapping="WrapWithOverflow" Width="70"/>
+                <PasswordBox Name="PasswordCheck" Margin="0, 0, 0, 10" Width="200" HorizontalAlignment="Left"/>
+            </StackPanel>
+            <!--<TextBlock Grid.Row="5" Margin="20, 0, 10, 0" Text="Password must be minimum 8 characters including at least 1 number."/>-->
+            <StackPanel Grid.Row="6" Orientation="Horizontal">
+                <Button Name="SubmitButtonLogin" Margin="20, 0, 0, 0" HorizontalAlignment="Left" MaxWidth="80" Content="Submit" Click="SubmitButtonLogin_Click"/>
+                <StackPanel Margin="20, 10, 0, 0" Orientation="Horizontal">
+                    <TextBlock Text="Already have an account?" FontFamily="Segoe UI Light" Foreground="White"/>
+                    <TextBlock Text="Log in" Name="LogIn"  FontFamily="Segoe UI Light" Foreground="White" Margin="10, 0, 0, 0" PreviewMouseDown="LogIn_PreviewMouseDown" TextDecorations="Underline"/>
+                </StackPanel>
+            </StackPanel>
+
+            
+        </Grid>
+    </Grid>
+</Page>
