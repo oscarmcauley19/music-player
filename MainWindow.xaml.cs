@@ -299,7 +299,7 @@ namespace ProjectDesign
                 Mp3Player.Source = CurrentSong.File;
             }
             // Collapse image element if no art
-            if (CurrentSong.Picture != null)
+            if (CurrentSong.Album != null || CurrentSong.Artist != null)
             {
                 AlbumArt.Visibility = Visibility.Visible;
                 LyricsButton.Visibility = Visibility.Visible;

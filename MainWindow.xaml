@@ -246,7 +246,7 @@
                 <Button Name="SettingsButton" Height="30" Margin="10, 5" Content="Settings" FontFamily="Segoe UI Light" Padding="5" Click="SettingsButton_Click"/>
             </StackPanel>
             <StackPanel Grid.Row="1" Margin="0,20,0,0" Name="ArtSection">
-                <Button Name="LyricsButton" Content="More info..." Visibility="Hidden" FontWeight="Bold" Foreground="SkyBlue" Background="Transparent" BorderBrush="SkyBlue" Margin="20,0,20,10" Click="LyricsButton_Click"/>
+                <Button Name="LyricsButton" Content="Discover..." Visibility="Hidden" FontWeight="Bold" Foreground="SkyBlue" Background="Transparent" BorderBrush="SkyBlue" Margin="20,0,20,10" Click="LyricsButton_Click"/>
                 <Image VerticalAlignment="Bottom" Name="AlbumArt" Visibility="Hidden" DataContext="{Binding CurrentSong}" Source="{Binding UpdateSourceTrigger=PropertyChanged, Path=Picture, Mode=OneWay}"/>
             </StackPanel>
 

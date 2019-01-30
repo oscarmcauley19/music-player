@@ -55,14 +55,33 @@ namespace ProjectDesign
                 LyricsBox.Text = lyrics;
 
                 LyricsSide.Visibility = Visibility.Visible;
-                if (InfoBox.Text != "") { ArtistSide.Visibility = Visibility.Visible; }
-                if (AlbumInfo.Text!= "") { AlbumSide.Visibility = Visibility.Visible; }
+                
                 //AlbumArt.Visibility = Visibility.Visible;
             }
             catch
             {
-
+                
             }
+
+            if (!(InfoBox.Text == "" && AlbumInfo.Text == ""))
+            {
+                ArtistSide.Visibility = Visibility.Visible;
+                AlbumSide.Visibility = Visibility.Visible;
+
+                if (InfoBox.Text == "")
+                {
+                    InfoBox.Text = "Sorry, no artist information could be found.";
+                }
+                if (AlbumInfo.Text == "")
+                {
+                    AlbumInfo.Text = "Sorry, no album information could be found.";
+                }
+            }
+            else
+            {
+                NoInfoText.Visibility = Visibility.Visible;
+            }
+            
         }
 
         static string GetReleaseAsString(HttpClient client, int releaseID)

@@ -34,6 +34,9 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
 
+        <TextBlock Grid.ColumnSpan="2" Grid.RowSpan="3" VerticalAlignment="Center" HorizontalAlignment="Center" 
+                   FontSize="30" Text="Sorry, we couldn't find any information about this song" TextWrapping="WrapWithOverflow"
+                   Visibility="Collapsed" MaxWidth="350" Name="NoInfoText"/>
         <Grid Name="ArtistSide" DataContext="{Binding Song}" Grid.Column="0" Grid.RowSpan="3" Margin="20" Visibility="Collapsed">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -41,6 +44,7 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
+            
             <TextBlock Text="{Binding Path=Artist}" Grid.Row="0" FontSize="30"/>
             <TextBlock Name="NextWikiButton" Grid.Row="1" Text="Not the right article? Click here to try again..." MouseUp="NextWikiButton_MouseUp" Foreground="Gray"/>
             <ScrollViewer Name="InfoScroller" Grid.Row="2">
@@ -54,7 +58,6 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            
             <StackPanel Name="LyricsSide" Grid.Row="0" Visibility="Collapsed">
                 <TextBlock Name="LyricsBox" FontSize="18" Opacity="0.7" OpacityMask="{StaticResource LyricsOpacityMask}"/>
                 <TextBlock Text="Click here to see full lyrics..." Name="LyricsLink" TextDecorations="Underline" Margin="0,5,0,20" MouseUp="LyricsLink_MouseUp"/>
