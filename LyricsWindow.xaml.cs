@@ -38,52 +38,86 @@ namespace ProjectDesign
             this.Song = CurrentSong;
             this.DataContext = this;
 
-            DisplayChanges();
+            // Begin search process with firstSearch as true
+            DisplayChanges(true);
         }
 
-        private void DisplayChanges()
+        private void DisplayChanges(bool firstSearch)
         {
-            InfoBox.Text = GetInfo(Song.Artist, artistArticleNo, "artist");
-            AlbumInfo.Text = GetInfo(Song.Album, albumArticleNo, "album");
+            // Get results and set textblocks to these values
+            InfoBox.Text = GetInfo(Song.Artist, artistArticleNo, "artist", firstSearch, Song);
+            AlbumInfo.Text = GetInfo(Song.Album, albumArticleNo, "album", firstSearch, Song);
+
             try
             {
+                // Attempt lyrics retrieval
                 LyricsResult response = GetLyrics(Song);
                 string lyrics = response.lyrics;
+
+                // Remove unwanted characters
                 Encoding iso8859 = Encoding.GetEncoding("ISO-8859-1");
                 lyrics = "\"" + Encoding.UTF8.GetString(iso8859.GetBytes(lyrics)) + "\"";
-                lyrics = lyrics.Replace("[...]", "...");
-                LyricsBox.Text = lyrics;
 
+                // Change ending signpost to make more user friendly 
+                lyrics = lyrics.Replace("[...]", "...");
+
+                // Set text to display on page
+                LyricsBox.Text = lyrics;
                 LyricsSide.Visibility = Visibility.Visible;
-                if (InfoBox.Text != "") { ArtistSide.Visibility = Visibility.Visible; }
-                if (AlbumInfo.Text!= "") { AlbumSide.Visibility = Visibility.Visible; }
-                //AlbumArt.Visibility = Visibility.Visible;
             }
             catch
             {
-
+                
             }
-        }
 
-        static string GetReleaseAsString(HttpClient client, int releaseID)
-        {
-            string url = "releases/" + releaseID.ToString();
-            HttpResponseMessage response = client.GetAsync(url).Result;
-
-            if (response.IsSuccessStatusCode)
+            // If at least one of the artist/album searches has yielded results
+            if (!(InfoBox.Text == "" && AlbumInfo.Text == ""))
             {
-                return response.Content.ReadAsStringAsync().Result;
-            }
+                // Make both boxes visible
+                ArtistSide.Visibility = Visibility.Visible;
+                AlbumSide.Visibility = Visibility.Visible;
 
-            Console.WriteLine("The GET request for releases failed.");
-            return null;
+                // Set specific labels explaining failed searches
+                if (InfoBox.Text == "")
+                {
+                    InfoBox.Text = "Sorry, no artist information could be found.";
+                }
+                if (AlbumInfo.Text == "")
+                {
+                    AlbumInfo.Text = "Sorry, no album information could be found.";
+                }
+            }
+            else
+            {
+                // If neither album or artist info could be found
+                // display larger message
+                NoInfoText.Visibility = Visibility.Visible;
+            }
+            
         }
+
+        //static string GetReleaseAsString(HttpClient client, int releaseID)
+        //{
+
+        //    string url = "releases/" + releaseID.ToString();
+        //    HttpResponseMessage response = client.GetAsync(url).Result;
+
+        //    if (response.IsSuccessStatusCode)
+        //    {
+        //        return response.Content.ReadAsStringAsync().Result;
+        //    }
+
+        //    Console.WriteLine("The GET request for releases failed.");
+        //    return null;
+        //}
 
         private LyricsResult GetLyrics(SongChoice CurrentSong)
         {
+            // Instantiate new LyricWiki objects
             LyricWiki wikiAttempt = new LyricWiki();
             LyricsResult response = new LyricsResult();
 
+            // If song exists in database, set response to the lyrics
             if (wikiAttempt.checkSongExists(CurrentSong.Artist, CurrentSong.Name))
             {
                 response = wikiAttempt.getSong(CurrentSong.Artist, CurrentSong.Name);
@@ -91,94 +125,162 @@ namespace ProjectDesign
             return response;
         }
 
-        private string GetInfo(string searchTerm, int articleNo, string searchMode)
+        private string GetInfo(string searchTerm, int articleNo, string searchMode, bool firstSearch, SongChoice chosenSong)
         {
+            // Create new encoding to convert results to printable text
             Encoding iso8859 = Encoding.GetEncoding("ISO-8859-1");
+            // Search Wikipedia for given term (max 50 results)
             var webClient = new WebClient();
-            var sourceCode = webClient.DownloadString(@"http://en.wikipedia.org/w/api.php?format=xml&action=opensearch&profile=engine_autoselect&limit=50&search=" + searchTerm);
-            //var sourceCode = webClient.DownloadString("http://en.wikipedia.org/w/api.php?format=xml&action=query&prop=extracts&titles=+"+ userChoice + "&redirects=1");
+            var unrefinedResult = webClient.DownloadString(@"http://en.wikipedia.org/w/api.php?format=xml&action=opensearch&profile=engine_autoselect&limit=50&search=" + searchTerm);
+            // Parse XML result and select Titles and Descriptions
             XmlDocument doc = new XmlDocument();
-            doc.LoadXml(sourceCode);
-            //doc.Save("temp.xml");
-            //Wikimedia wm = new Wikimedia("temp.xml");
-            //WikimediaPage wmp = new WikimediaPage();
-            var allResults = doc.GetElementsByTagName("Text");
-            XmlNode fnode;
+            doc.LoadXml(unrefinedResult);
+            var allTitles = doc.GetElementsByTagName("Text");
+            var allDescriptions = doc.GetElementsByTagName("Description");
+            XmlNode desiredNode = null;
 
             if (searchMode == "album")
             {
-                fnode = doc.GetElementsByTagName("Text")[articleNo - 1];
-                foreach (XmlNode result in allResults)
+                int count;
+                // If this isn't first search on opening of window:
+                if (!firstSearch)
                 {
-                    if (result.InnerText.Contains("album"))
-                    {
-                        fnode = result;
-                        break;
-                    }
+                    // count set to current articleNo-1 as Album search has extra node
+                    count = articleNo - 1;
+                    desiredNode = doc.GetElementsByTagName("Text")[articleNo - 1];
                 }
-            }
-            else
-            {
-                fnode = doc.GetElementsByTagName("Text")[articleNo];
-                foreach (XmlNode result in allResults)
+                else
                 {
-                    if (result.InnerText.Contains("band"))
+                    // Start from 0 if first search
+                    count = 0;
+                }
+
+                // Cycle through search results
+                foreach (XmlNode result in allTitles)
+                {
+                    // If title or description contain artist name and language 
+                    // suggesting it's an album
+                    try
                     {
-                        fnode = result;
-                        break;
+                        if ((result.InnerText.Contains("album") ||
+                            result.InnerText.Contains("EP") ||
+                            allDescriptions[count].FirstChild.Value.ToString().Contains("album")) &&
+                            allDescriptions[count].FirstChild.Value.ToString().Contains(chosenSong.Artist))
+                        {
+                            //Desired Wiki has been found
+                            desiredNode = result;
+                            break;
+                        }
+                        count++;
+                    }
+                    catch
+                    {
+
                     }
                 }
             }
 
-            // var fnode = doc.GetElementsByTagName("Text")[articleNo];
+            // If searching for an artist
+            else
+            {
+                int count;
+                if (!firstSearch)
+                {
+                    // Set desiredNode to current result
+                    count = articleNo;
+                    desiredNode = doc.GetElementsByTagName("Text")[articleNo];
+                }
+                else
+                {
+                    // If this is first search, start from first result
+                    count = 0;
+                }
+
+                // Cycle through results
+                foreach (XmlNode result in allTitles)
+                {
+                    // Checks if result contains language to suggest 
+                    // it is about a musical artist
+                    try
+                    {
+                        if (result.InnerText.Contains("band") ||
+                            result.InnerText.Contains("artist") ||
+                            result.InnerText.Contains("musician") ||
+                            allDescriptions[count].FirstChild.Value.ToString().Contains("band") ||
+                            allDescriptions[count].FirstChild.Value.ToString().Contains("artist"))
+                        {
+                            // Set desiredNode to current result
+                            desiredNode = result;
+                            break;
+                        }
+                        count++;
+                    }
+                    catch
+                    {
+
+                    }
+                }
+            }
 
             try
             {
-                string firstResult = Encoding.UTF8.GetString(iso8859.GetBytes(fnode.InnerText));
+                // Now desired result is found, specific search to find the article is made
+                string firstResult = Encoding.UTF8.GetString(iso8859.GetBytes(desiredNode.InnerText));
 
-                string sourceCode2 = webClient.DownloadString("http://en.wikipedia.org/w/api.php?format=xml&action=query&exintro&explaintext&prop=extracts&titles=+" + firstResult + "&redirects=1");
+                string descriptionSearch = webClient.DownloadString(
+                    "http://en.wikipedia.org/w/api.php?format=xml&action=query&exintro&explaintext" +
+                    "&prop=extracts&titles=+" + firstResult + "&redirects=1");
+
+                // Parse XML output to extract paragraph
                 XmlDocument doc2 = new XmlDocument();
-                return GetParagraph(doc2, sourceCode2);
+                return GetParagraph(doc2, descriptionSearch);
             }
 
             catch
             {
+                // No suitable result found
                 return "";
             }
         }
 
-        private string GetParagraph(XmlDocument doc, string sourceCode)
+        private string GetParagraph(XmlDocument doc, string unrefinedResult)
         {
+            // Extract paragraph through iso8859 encoding
             Encoding iso8859 = Encoding.GetEncoding("ISO-8859-1");
-            doc.LoadXml(sourceCode);
-            var fnode = doc.GetElementsByTagName("extract")[0];
-            string ss = fnode.InnerText;
-            //string ss = doc.InnerText;
+            doc.LoadXml(unrefinedResult);
+            var desiredNode = doc.GetElementsByTagName("extract")[0];
+            string descParagraph = desiredNode.InnerText;
+            
+            // Regular expression:
+            // matches any leftover XML tags
             Regex regex = new Regex("\\<[^\\>]*\\>");
-            string.Format("Before:{0}", ss);
-            ss = regex.Replace(ss, string.Empty);
-            string result = String.Format(ss);
+            // Remove unwanted characters, extract pure text
+            descParagraph = regex.Replace(descParagraph, string.Empty);
+            string result = String.Format(descParagraph);
             return Encoding.UTF8.GetString(iso8859.GetBytes(result));
         }
 
         private void LyricsLink_MouseUp(object sender, MouseButtonEventArgs e)
         {
+            // Get lyrics, open url attached to object
             LyricsResult response = GetLyrics(Song);
             Process.Start(response.url);
         }
 
         private void NextWikiButton_MouseUp(object sender, MouseButtonEventArgs e)
         {
+            // Move to next article for artist and display the new changes
             artistArticleNo++;
-            GetInfo(Song.Artist, artistArticleNo, "artist");
-            DisplayChanges();
+            GetInfo(Song.Artist, artistArticleNo, "artist", false, Song);
+            DisplayChanges(false);
         }
 
         private void NextWikiButtonAlbum_MouseUp(object sender, MouseButtonEventArgs e)
         {
+            // Move to next article for album and display the new changes
             albumArticleNo++;
-            GetInfo(Song.Artist, albumArticleNo, "album");
-            DisplayChanges();
+            GetInfo(Song.Artist, albumArticleNo, "album", false, Song);
+            DisplayChanges(false);
         }
     }
 }

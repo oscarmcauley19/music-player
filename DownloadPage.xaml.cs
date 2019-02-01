@@ -51,12 +51,12 @@ namespace ProjectDesign
             string connectionStringDB = Properties.Settings.Default.DBConnectionString;
 
             //Sets datatable to output of database query
-            dataTable = loadFromDB(connectionStringDB, dataTable);
+            dataTable = LoadFromDB(connectionStringDB, dataTable);
             //Outputs songs from database to DataGrid
             downloadGrid.ItemsSource = dataTable.DefaultView;
         }
 
-        private DataTable loadFromDB(string connectionString, DataTable dt)
+        private DataTable LoadFromDB(string connectionString, DataTable dt)
         {
             try
             {
