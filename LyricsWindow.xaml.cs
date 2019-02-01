@@ -158,14 +158,19 @@ namespace ProjectDesign
                 // Cycle through search results
                 foreach (XmlNode result in allTitles)
                 {
-                    // If title or description contain artist name and language 
-                    // suggesting it's an album
                     try
                     {
+                        // Needs encoding to fix special characters
+                        string currentDesc = Encoding.UTF8.GetString(iso8859.GetBytes
+                            (allDescriptions[count].FirstChild.Value.ToString()));
+
+                        // If title or description contain artist name and language 
+                        // suggesting it's an album
                         if ((result.InnerText.Contains("album") ||
                             result.InnerText.Contains("EP") ||
-                            allDescriptions[count].FirstChild.Value.ToString().Contains("album")) &&
-                            allDescriptions[count].FirstChild.Value.ToString().Contains(chosenSong.Artist))
+                            currentDesc.Contains("album")) &&
+                           currentDesc.IndexOf(chosenSong.Artist,
+                            StringComparison.OrdinalIgnoreCase) >= 0) // case insensitive for more flexibility
                         {
                             //Desired Wiki has been found
                             desiredNode = result;
