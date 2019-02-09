@@ -24,6 +24,7 @@ namespace ProjectDesign
         public LoginWindow()
         {
             InitializeComponent();
+            // Open Login page within window
             LoginPage currentPage = new LoginPage();
             this.Content = currentPage;
         }

@@ -49,7 +49,6 @@ namespace ProjectDesign
         SongList shuffledQueue = new SongList();
         SongList totalSongSelection = new SongList();
         bool sliderUpdating = true;
-
         SongChoice _CurrentSong = new SongChoice();
         public SongChoice CurrentSong
         {
@@ -57,32 +56,25 @@ namespace ProjectDesign
             set
             {
                 _CurrentSong = value;
+                // Allows XAML to track when CurrentSong updated
                 this.OnPropertyChanged("CurrentSong");
             }
         }
-
-        //List<SongChoice> _totalSongSelection = new List<SongChoice>();
-        //public List<SongChoice> totalSongSelection
-        //{
-        //    get { return _totalSongSelection; }
-        //    set
-        //    {
-        //        _totalSongSelection = value;
-        //        //this.OnPropertyChanged("totalSongSelection");
-        //    }
-        //}
 
         public MainWindow()
         {
             InitializeComponent();
             LoadDefaultSongs();
 
-            this.DataContext = this; //sets data context to this region
+            this.DataContext = this; //sets data context to MainWindow class
 
-            this.Top = Properties.Settings.Default.Top;
-            this.Left = Properties.Settings.Default.Left;
-            this.Height = Properties.Settings.Default.Height;
-            this.Width = Properties.Settings.Default.Width;
+            // Set dimensions remembered from last session
+            SetWindowDimensions(
+                Properties.Settings.Default.Top,
+                Properties.Settings.Default.Left,
+                Properties.Settings.Default.Height,
+                Properties.Settings.Default.Width,
+                Properties.Settings.Default.Maximized);
 
             if (Properties.Settings.Default.Maximized)
             {
@@ -101,10 +93,18 @@ namespace ProjectDesign
             }
         }
 
-        private void AttemptUserLogin()
+        private void SetWindowDimensions(double top, double left, double height, double width, bool maximised)
         {
-            User.id = Convert.ToInt32(Properties.Settings.Default.UserID);
-            User.username = Properties.Settings.Default.UserName;
+            // Set dimensions based on params
+            this.Top = top;
+            this.Left = left ;
+            this.Height = height;
+            this.Width = width;
+
+            if (maximised)
+            {
+                WindowState = WindowState.Maximized;
+            }
         }
 
         private void ChooseFilesButton_Click(object sender, RoutedEventArgs e)
@@ -130,10 +130,12 @@ namespace ProjectDesign
                 {
                     try
                     {
+                        // Add song to list
                         totalSongSelection.Add(GenerateObjects(filename));
                     }
                     catch
                     {
+                        // Error message
                         MessageBox.Show("Files could not be imported.");
                     }
                 }
@@ -144,23 +146,26 @@ namespace ProjectDesign
 
         private void InitialiseQueues()
         {
-            ShuffleButton.Background = Brushes.Transparent;
-            ShuffleButton.Foreground = Brushes.White;
+            // Reset the song grid with new items
             songGrid.Items.Refresh();
 
             SongList tempList = new SongList();
             tempList.AddRange(totalSongSelection);
 
+            // Unshuffled & shuffled queues exist alongside each other
             unshuffledQueue.ClearAndReplace(totalSongSelection);
             shuffledQueue.ClearAndReplace(tempList);
             shuffledQueue.Shuffle();
 
+            // If shuffle is chosen
             if (ShuffleButton.IsChecked == true)
             {
+                // Sets current queue to shuffled one
                 Queue.ClearAndReplace(shuffledQueue);
             }
             else
             {
+                // Sets current queue to unshuffled one
                 Queue.ClearAndReplace(unshuffledQueue);
             }
         }
@@ -171,8 +176,8 @@ namespace ProjectDesign
             itemCollectionViewSource = (CollectionViewSource)(FindResource("ItemCollectionViewSource"));
             itemCollectionViewSource.Source = totalSongSelection.GetList();
             songGrid.ScrollIntoView(CollectionView.NewItemPlaceholder);
-            //this initialises the data binding environment between the DataGrid and totalSongSelection list
-            //through use of a item collection, which allows for sorting & filtering
+            // this initialises the data binding environment between the DataGrid and totalSongSelection list
+            // through use of a item collection, which allows for sorting & filtering
         }
 
         private SongChoice GenerateObjects(string filepath)
@@ -226,80 +231,107 @@ namespace ProjectDesign
 
         private MediaState GetMediaState(MediaElement myMedia)
         {
+            // Code from StackOverflow to find whether media element is playing
+            // No easy way to do so in WPF
             FieldInfo hlp = typeof(MediaElement).GetField("_helper", BindingFlags.NonPublic | BindingFlags.Instance);
             object helperObject = hlp.GetValue(myMedia);
             FieldInfo stateField = helperObject.GetType().GetField("_currentState", BindingFlags.NonPublic | BindingFlags.Instance);
             MediaState state = (MediaState)stateField.GetValue(helperObject);
             return state;
         }
-
+        
+        // Method runs when pause button clicked
         private void PausePlay_Click(object sender, RoutedEventArgs e)
         {
             //Queue = songGrid.SelectedItems.OfType<Uri>().ToList();
             ;
             if (GetMediaState(Mp3Player) == MediaState.Play)
             {
+                // Pause if currently playing
                 Mp3Player.Pause();
+                // In font used 4 corresponds to play symbol
                 PausePlayButton.Content = "4";
             }
             else
             {
+                // Play if currently paused
                 Mp3Player.Play();
+                // In font used ; corresponds to pause symbol
                 PausePlayButton.Content = ";";
             }
         }
 
         private void Mp3PlayerTimer_Tick(object sender, EventArgs e)
         {
-            if (Mp3Player.Source != null && Mp3Player.NaturalDuration.HasTimeSpan) /* We will check if the source is null, and if the media element has a time span and if the answer is yes we execute the following code */
+            // Check if the source is null, and if the media element has a time span 
+            // If yes, then run
+            if (Mp3Player.Source != null && Mp3Player.NaturalDuration.HasTimeSpan) 
             {
-                Mp3Slider.Maximum = Mp3Player.NaturalDuration.TimeSpan.TotalSeconds; /*This will set the maxim value (seconds) of the slider. I like to put it here in the Timer_Tick because I don't like to create a new mediaPlayer every time I open a song so this parameter will not update if I don't call that function again. Putting it here makes sure will always have the right value if songs are changing */
+                // Set max value of slider in seconds
+                Mp3Slider.Maximum = Mp3Player.NaturalDuration.TimeSpan.TotalSeconds;
                 if (sliderUpdating == true)
                 {
-                    Mp3Slider.Value = Mp3Player.Position.TotalSeconds; /* Here be careful because in some tutorial online, you will find Position.Seconds which is not a good solution because everytime the seconds arrive to 60, they reset from 1 again so will not work properly. */
+                    Mp3Slider.Value = Mp3Player.Position.TotalSeconds;
                 }
 
                 else
                 {
-                    Mp3Slider.Value = 0; //We don't want the slider to stay in some strange position if the song ends//
+                    // Reset position of ticker after song ends
+                    Mp3Slider.Value = 0;
                 }
             }
         }
 
-        private void Play (SongChoice current, string mode)
+        private SongChoice Play (SongChoice current, string mode)
         {
             try
             {
                 if (mode == "next")
                 {
-                    SongChoice nextSong = Queue.GetList()[Queue.FindIndex(CurrentSong) + 1];
-                    CurrentSong = nextSong;
-                    Mp3Player.Source = CurrentSong.File;
+                    // Skip forward a song
+                    SongChoice nextSong = Queue.GetList()[Queue.FindIndex(current) + 1];
+                    current = nextSong;
+                    // Play new song
+                    Mp3Player.Source = current.File;
+                    return current;
                 }
                 else if (mode == "prev")
                 {
-                    SongChoice prevSong = Queue.GetList()[Queue.FindIndex(CurrentSong) - 1];
-                    CurrentSong = prevSong;
-                    Mp3Player.Source = CurrentSong.File;
+                    // Go back a song
+                    SongChoice prevSong = Queue.GetList()[Queue.FindIndex(current) - 1];
+                    current = prevSong;
+                    // Play new song
+                    Mp3Player.Source = current.File;
+                    return current;
                 }
                 else
                 {
-                    var converter = new System.Windows.Media.BrushConverter();
-                    var highlightBrush = (Brush)converter.ConvertFromString("#FFFFFF90");
-                    //OnPropertyChanged("CurrentSong");
-                    Mp3Player.Source = CurrentSong.File; //refreshes Mp3Player
+                    //var converter = new BrushConverter();
+                    //var highlightBrush = (Brush)converter.ConvertFromString("#FFFFFF90");
+                    Mp3Player.Source = current.File; //refreshes Mp3Player
                     Mp3Player.Play(); //Play song
                     PausePlayButton.Content = ";";
+                    return current;
                 }
             }
+            // if indexing error occurs
             catch
             {
-                if(mode == "prev") { CurrentSong = Queue.GetList()[Queue.GetList().Count - 1]; }
-                else { CurrentSong = Queue.GetList()[0]; }
-                Mp3Player.Source = CurrentSong.File;
+                if(mode == "prev")
+                {
+                    // Go back to end of queue when rewinding from 1st song
+                    current = Queue.GetList()[Queue.GetList().Count - 1];
+                }
+                else
+                {
+                    // If going forward & reached end of queue, go back to start
+                    current = Queue.GetList()[0];
+                }
+                Mp3Player.Source = current.File;
+                return current;
             }
             // Collapse image element if no art
-            if (CurrentSong.Album != null || CurrentSong.Artist != null)
+            if (current.Album != null || current.Artist != null)
             {
                 AlbumArt.Visibility = Visibility.Visible;
                 LyricsButton.Visibility = Visibility.Visible;
@@ -346,8 +378,10 @@ namespace ProjectDesign
 
         private void HandleChecked(object sender, RoutedEventArgs e)
         {
-            //ShuffleButton.Background = Brushes.SlateBlue;
-            ShuffleButton.Foreground = Brushes.DarkTurquoise;
+            // Shuffle button changes colour to show it's on
+            ShuffleButton.Foreground = Brushes.DeepPink;
+            ShuffleButton.FontWeight = FontWeights.Bold;
+            //Re-shuffle queue and set to current
             shuffledQueue.ClearAndReplace(totalSongSelection);
             shuffledQueue.Shuffle();
             Queue.ClearAndReplace(shuffledQueue);
@@ -355,16 +389,18 @@ namespace ProjectDesign
 
         private void HandleUnchecked(object sender, RoutedEventArgs e)
         {
+            // Return button to normal look to show it's off
             ShuffleButton.Background = Brushes.Transparent;
             ShuffleButton.Foreground = Brushes.White;
-            Queue.Clear();
-            Queue.AddRange(unshuffledQueue);
+            ShuffleButton.FontWeight = FontWeights.Normal;
+            // Set Queue to unshuffled again
+            Queue.ClearAndReplace(unshuffledQueue);
         }
 
         private void Row_DoubleClick(object sender, MouseButtonEventArgs e) //when a song is double clicked in grid
         {
             CurrentSong = songGrid.SelectedItem as SongChoice; //sets SongChoice object CurrentSong to selected item
-            Play(CurrentSong, "current");
+            CurrentSong = Play(CurrentSong, "current");
             if (CurrentSong.Picture != null)
             {
                 AlbumArt.Visibility = Visibility.Visible;
@@ -388,77 +424,82 @@ namespace ProjectDesign
 
                 switch (sortMetric)
                 {
+                    // title header clicked
                     case " T I T L E":
+                        // if current is ascending, new will be descending
                         if (sortDirection == "Ascending")
                         {
-                            //Queue = Queue.OrderByDescending(n => n.Name).ToList();
-                            //MergeSort(Queue, "Name");
-                            Queue.AlphabeticalSort("Name", false);
-                            //Queue.Reverse();
-
+                            // sorted in descending by song title
+                            unshuffledQueue.AlphabeticalSort("Name", false);
                         }
                         else
                         {
-                            //Queue = Queue.OrderBy(n => n.Name).ToList();
-                            //MergeSort(Queue, "Name");
-                            Queue.AlphabeticalSort("Name", true);
+                            // sorted in ascending by song title
+                            unshuffledQueue.AlphabeticalSort("Name", true);
                         }
                         break;
+                    // album header clicked
                     case " A L B U M":
                         if (sortDirection == "Ascending")
                         {
-                            //Queue = Queue.OrderByDescending(a => a.Album).ToList();
-                            //MergeSort(Queue, "Album");
-                            Queue.AlphabeticalSort("Album", false);
-                            //Queue.Reverse();
+                            // CUSTOM merge sort algorithm orders first on album,
+                            // then by title so songs of same album are also ordered
+                            unshuffledQueue.AlphabeticalSort("Album", false);
                         }
                         else
                         {
-                            //Queue = Queue.OrderBy(a => a.Album).ToList();
-                            //MergeSort(Queue, "Album");
-                            Queue.AlphabeticalSort("Album", true);
+                            unshuffledQueue.AlphabeticalSort("Album", true);
                         }
                         break;
+                    // artist header clicked
                     case " A R T I S T":
                         if (sortDirection == "Ascending")
                         {
-                            //Queue = Queue.OrderByDescending(a => a.Artist).ToList();
-                            //MergeSort(Queue, "Artist");
-                            Queue.AlphabeticalSort("Artist", false);
-                            //Queue.Reverse();
+                            // CUSTOM merge sort algorithm orders first on artist,
+                            // then by title so songs of same artist are also ordered
+                            unshuffledQueue.AlphabeticalSort("Artist", false);
                         }
                         else
                         {
-                            //Queue = Queue.OrderBy(a => a.Artist).ToList();
-                            //MergeSort(Queue, "Artist");
-                            Queue.AlphabeticalSort("Artist", true);
+                            unshuffledQueue.AlphabeticalSort("Artist", true);
                         }
                         break;
+                    // duration header clicked
                     case " D U R A T I O N":
                         if (sortDirection == "Ascending")
                         {
-                            //Queue = Queue.OrderByDescending(l => TimeSpan.Parse(l.Length)).ToList();
-                            Queue.OrderTimeByDescending();
+                            // Default C# algorithm used as custom merge sort
+                            // designed for strings - this method is hard
+                            // to replicate
+                            unshuffledQueue.OrderTimeByDescending();
                         }
                         else
                         {
-                            //Queue = Queue.OrderBy(l => TimeSpan.Parse(l.Length)).ToList();
-                            Queue.OrderTimeByAscending();
+
+                            unshuffledQueue.OrderTimeByAscending();
                         }
                         break;
+                }
+
+                // if shuffle is disabled
+                if (ShuffleButton.IsChecked == false)
+                {
+                    // set current queue to new order
+                    Queue.ClearAndReplace(unshuffledQueue);
                 }
             }
         }
 
-        public static List<string> GetAttributes(List<SongChoice> inputList, string att)
-        {
-            List<string> tempValues = new List<string>();
-            foreach (SongChoice song in inputList)
-            {
-                tempValues.Add(song.GetType().GetProperty(att).GetValue(song, null).ToString());
-            }
-            return tempValues;
-        }
+        //public static List<string> GetAttributes(List<SongChoice> inputList, string att)
+        //{
+        //    // 
+        //    List<string> tempValues = new List<string>();
+        //    foreach (SongChoice song in inputList)
+        //    {
+        //        tempValues.Add(song.GetType().GetProperty(att).GetValue(song, null).ToString());
+        //    }
+        //    return tempValues;
+        //}
 
         // Sort list of songs based on specified attribute (att)
         //public static void MergeSort(List<SongChoice> inputList, string att)
@@ -560,30 +601,32 @@ namespace ProjectDesign
         //    }
         //}
 
-        private void RW_Click(object sender, RoutedEventArgs e) //when RW button clicked
+        private void RW_Click(object sender, RoutedEventArgs e) // when RW button clicked
         {
-            if (Mp3Player.Position < TimeSpan.FromSeconds(4)) //if song is less then 4 seconds in
+            if (Mp3Player.Position < TimeSpan.FromSeconds(4)) // if song is less then 4 seconds in
             {
-                Play(CurrentSong, "prev"); //play previous song
+                CurrentSong = Play(CurrentSong, "prev"); // play previous song
             }
             else
             {
-                Mp3Player.Position = TimeSpan.FromSeconds(0); //otherwise, start song again
+                Mp3Player.Position = TimeSpan.FromSeconds(0); // otherwise, start song again
             }
         }
 
         private void FFW_Click(object sender, RoutedEventArgs e) //when FFW button clicked
         {
-            Play(CurrentSong, "next"); //play next song
+            CurrentSong = Play(CurrentSong, "next"); //play next song
         }
 
         private void Mp3Slider_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             {
-                sliderUpdating = false; //When is set to false the slider is not updating automatically so we can change it
+                // When is set to false the slider is not updating automatically so we can change it
+                sliderUpdating = false; 
             }
         }
 
+        // When user releases mouse, ticker is in new position
         private void Mp3Slider_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             try
@@ -592,24 +635,32 @@ namespace ProjectDesign
                 {
                     try
                     {
+                        // Sets new position set by user
                         Mp3Player.Position = TimeSpan.FromSeconds(Mp3Slider.Value);
                     }
                     catch { return; }
                 }
-                sliderUpdating = true; //Don't forget to set it true here if no the slider will not update automatically when we release it if is set false.
+
+                // Ensure slider continues to update automatically
+                sliderUpdating = true;
             }
             catch { }
         }
 
+        // When song ends
         private void Mp3Player_MediaEnded(object sender, RoutedEventArgs e)
         {
-            Play(CurrentSong, "next");
+            // Set CurrentSong next in queue
+            CurrentSong = Play(CurrentSong, "next");
         }
 
+        // If media player is given a file to play
         private void Mp3Player_MediaOpened(object sender, RoutedEventArgs e)
-        {
+        { 
+            // error handling - only attempts time tracking if actually possible
             if (Mp3Player.NaturalDuration.HasTimeSpan)
             {
+                // Timer starts
                 DispatcherTimer Mp3PlayerTimer = new DispatcherTimer();
                 Mp3PlayerTimer.Interval = TimeSpan.FromMilliseconds(1000);
                 Mp3PlayerTimer.Tick += Mp3PlayerTimer_Tick;
@@ -617,58 +668,60 @@ namespace ProjectDesign
             }
         }
 
+        // Upload button clicked
         private void UploadButton_Click(object sender, RoutedEventArgs e)
         {
+            // Open upload window
             UploadWindow newwin = new UploadWindow();
             newwin.Show();
         }
 
+        // Download button clicked
         private void DownloadButton_Click(object sender, RoutedEventArgs e)
         {
+            // Open download window
             DownloadPage newwin = new DownloadPage();
             newwin.Show();
         }
 
+        // Login button clicked
         private void LoginButton_Click(object sender, RoutedEventArgs e)
         {
+            // Open login window
             LoginWindow newwin = new LoginWindow();
             newwin.Show();
         }
 
-        //private bool handle = true;
-        //private void ViewComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        //{
-        //    if (handle) Handle();
-        //    handle = true;
-        //}
+        // Settings Button Clicked
+        private void SettingsButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Settings window opened
+            SettingsWindow newwin = new SettingsWindow();
+            newwin.Show();
+        }
 
-        //private void ViewComboBox_DropDownClosed(object sender, EventArgs e)
-        //{
-        //    ComboBox viewCB = sender as ComboBox;
-        //    handle = !viewCB.IsDropDownOpen;
-        //    Handle();
-        //}
+        // Sign out button clicked in user dropdown menu
+        private void SignOutButton_Click(object sender, RoutedEventArgs e)
+        {
+            // ID set to signal value - tells program no user
+            User.id = -1;
+            User.username = null;
+            // Stop program trying to auto-login on startup
+            Properties.Settings.Default.RememberUser = false;
+            // Close user display as no one logged in anymore
+            UserExpander.Visibility = Visibility.Collapsed;
 
-        //private void Handle()
-        //{
-        //    switch (ViewComboBox.SelectedItem.ToString().Split(new string[] { ": " }, StringSplitOptions.None).Last())
-        //    {
-        //        //case "Songs":
-        //        //    var control = ContentControlMain.Content as SongsView;
-        //        //    if (control != null)
-        //        //    {
-        //        //        control.songGrid();
-        //        //    }
-        //        //    break;
-        //        case "Artists":
-        //            DataContext = new ArtistsViewModel();
-        //            break;
-        //        case "Albums":
-        //            DataContext = new AlbumsViewModel();
-        //            break;
-        //    }
-        //}
+        }
 
+        // 'Discover' button clicked
+        private void LyricsButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Discover/lyrics window opened
+            LyricsWindow newWindow = new LyricsWindow(CurrentSong);
+            newWindow.Show();
+        }
+
+        // Runs when user closes main window
         private void Window_Closing(object sender, CancelEventArgs e)
         {
             if (WindowState == WindowState.Maximized)
@@ -690,117 +743,68 @@ namespace ProjectDesign
                 Properties.Settings.Default.Maximized = false;
             }
 
+            // If user has chosen to be remembered
             if (User.remember)
             {
+                // Sets user details to defaults for next session
                 Properties.Settings.Default.UserName = User.username;
                 Properties.Settings.Default.UserID = User.id;
                 Properties.Settings.Default.RememberUser = true;
             }
             else
             {
+                // Remember user is set to false - means program won't
+                // try to run login procedure automatically on start
                 Properties.Settings.Default.RememberUser = false;
             }
-            Properties.Settings.Default.Save();
 
+            // Properties are saved for next session
+            Properties.Settings.Default.Save();
         }
 
         private void SongGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
+            // Empty but kept in case wanted to add functionality
         }
 
-        //private bool handle = true;
-        //private void ViewComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        //{
-        //    if (handle)Handle();
-        //    handle = true;
-        //}
-
-        //private void ViewComboBox_DropDownClosed(object sender, EventArgs e)
-        //{
-        //    ComboBox viewCB = sender as ComboBox;
-        //    handle = !viewCB.IsDropDownOpen;
-        //    Handle();
-        //}
-
-        //private void Handle()
-        //{
-        //    switch (ViewComboBox.SelectedItem.ToString().Split(new string[] { ": " }, StringSplitOptions.None).Last())
-        //    {
-        //        case "Songs":
-        //            DataContext = new SongsViewModel();
-        //            break;
-        //        case "Artists":
-        //            DataContext = new ArtistsViewModel();
-        //            break;
-        //        case "Albums":
-        //            DataContext = new AlbumsViewModel();
-        //            break;
-        //    }
-        //}
-
-        private Random rng = new Random(); //generates new random number
-
-        private List<SongChoice> Shuffle(List<SongChoice> list) //method for shuffle taking undefined list as input
-        {
-            int n = list.Count;
-            while (n > 1)
-            {
-                n--;
-                int k = rng.Next(n + 1);
-                SongChoice value = list[k];
-                list[k] = list[n];
-                list[n] = value;
-            }
-            return list;
-        }
-
-        private void SettingsButton_Click(object sender, RoutedEventArgs e)
-        {
-            SettingsWindow newwin = new SettingsWindow();
-            newwin.Show();
-        }
-
+        // Runs when user login status has changed and the user display has been updated
         private void UserDisplay_TargetUpdated(object sender, DataTransferEventArgs e)
         {
+            // If no user is logged in
             if (UserExpander.Header as string == null || UserExpander.Header as string == "")
             {
+                // Hide user section
                 UserExpander.Visibility = Visibility.Collapsed;
             }
+            // If new login
             else
             {
+                // Display the user section
                 UserExpander.Visibility = Visibility.Visible;
             }
         }
 
+        // Run at start to load the default directory of songs given by user
         private void LoadDefaultSongs()
         {
             try
             {
-                foreach (string filename in Directory.EnumerateFiles(Properties.Settings.Default.DefaultPath, "*.mp3"))
+                // For every song in location
+                foreach (string filename in Directory.EnumerateFiles
+                    (Properties.Settings.Default.DefaultPath, "*.mp3"))
                 {
+                    // Do initialisation procedure for adding songs
                     LoadIntoGrid();
                     totalSongSelection.Add(GenerateObjects(filename));
                     InitialiseQueues();
+
+                    // Display songs to user
                     songGrid.Items.Refresh();
                 }
             }
+            // No message to user as error simply means they
+            // haven't chosen to auto-load files
             catch { }
-        }
-
-        private void SignOutButton_Click(object sender, RoutedEventArgs e)
-        {
-            User.id = -1;
-            User.username = null;
-            Properties.Settings.Default.RememberUser = false;
-            UserExpander.Visibility = Visibility.Collapsed;
-
-        }
-
-        private void LyricsButton_Click(object sender, RoutedEventArgs e)
-        {
-            LyricsWindow newWindow = new LyricsWindow(CurrentSong);
-            newWindow.Show();
         }
     }
 }

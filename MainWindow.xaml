@@ -261,12 +261,12 @@
             </Grid.RowDefinitions>
             
             <Grid Grid.Row="0" Grid.Column="1">
-                
+
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
                     <ColumnDefinition Width="120"/>
                 </Grid.ColumnDefinitions>
-                
+
                 <StackPanel Grid.Column="0" Orientation="Horizontal">
 
                     <TextBlock Grid.Column="0" Text="S O N G S" HorizontalAlignment="Center" Margin="18" FontSize="30" Foreground="White" />

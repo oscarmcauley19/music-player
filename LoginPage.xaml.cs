@@ -77,17 +77,20 @@ namespace ProjectDesign
 
         private void SubmitButton_Click(object sender, RoutedEventArgs e)
         {
-            
+            // Get connection details from app properties
             string connectionString = Properties.Settings.Default.DBConnectionString;
             try
             {
                 string username = UsernameInput.Text;
                 string password = PasswordInput.Password;
 
+                // Get ID from db query
                 int id = LoginCheck(username, password, connectionString);
 
+                // -999 = login failed
                 if (id != -999)
                 {
+                    // User is set
                     User.id = id;
                     User.username = username;
 
@@ -95,6 +98,7 @@ namespace ProjectDesign
                     Properties.Settings.Default.UserID = User.id;
                     Properties.Settings.Default.RememberUser = false;
 
+                    // Open Main Window if not already open
                     if (IsWindowOpen<Window>("MainWindow"))
                     {
                         MainWindow openMain = new MainWindow();
@@ -105,11 +109,13 @@ namespace ProjectDesign
                 }
                 else
                 {
+                    // Output error message
                     MessageBox.Show("Error logging in. User not found.");
                 }
         }
             catch
             {
+                // Output error message
                 MessageBox.Show("Account not found.");
             }
 }
