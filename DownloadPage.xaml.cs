@@ -134,46 +134,46 @@ namespace ProjectDesign
             }
         }
 
-        private List<SongChoice> ProcessFiles(List<SongChoice> inputList, DataTable dt)
-        {
-            int numOfColumns = dt.Columns.Count;
-            string filename;
-            DownloadBar.Maximum = dt.Columns.Count;
+        //private List<SongChoice> ProcessFiles(List<SongChoice> inputList, DataTable dt)
+        //{
+        //    int numOfColumns = dt.Columns.Count;
+        //    string filename;
+        //    DownloadBar.Maximum = dt.Columns.Count;
 
-            // Run for every row in datatable
-            foreach (DataRow dr in dt.Rows)
-            {
-                for (int i = 0; i < numOfColumns; i++)
-                {
-                    // Create file from filename in element i in row
-                    filename = @Properties.Settings.Default.FTPAddress + "/" + dr[i].ToString();
-                    Uri fileUri = new Uri(@filename);
+        //    // Run for every row in datatable
+        //    foreach (DataRow dr in dt.Rows)
+        //    {
+        //        for (int i = 0; i < numOfColumns; i++)
+        //        {
+        //            // Create file from filename in element i in row
+        //            filename = @Properties.Settings.Default.FTPAddress + "/" + dr[i].ToString();
+        //            Uri fileUri = new Uri(@filename);
 
-                    // Use TagLib extension to gain control of metadata values
-                    TagLib.File file = TagLib.File.Create(@filename);
+        //            // Use TagLib extension to gain control of metadata values
+        //            TagLib.File file = TagLib.File.Create(@filename);
 
-                    // Round the value for duration and change format to minutes & seconds
-                    TimeSpan duration = file.Properties.Duration;
-                    int timespanSize = 7; //timespan is always this length
-                    int factor = (int)Math.Pow(10, (timespanSize));
-                    string roundedDuration = new TimeSpan(((long)Math.Round((1.0 * duration.Ticks / factor)) * factor)).ToString(@"mm\:ss");
+        //            // Round the value for duration and change format to minutes & seconds
+        //            TimeSpan duration = file.Properties.Duration;
+        //            int timespanSize = 7; //timespan is always this length
+        //            int factor = (int)Math.Pow(10, (timespanSize));
+        //            string roundedDuration = new TimeSpan(((long)Math.Round((1.0 * duration.Ticks / factor)) * factor)).ToString(@"mm\:ss");
 
-                    // Create new SongChoice object and assigns values gained to attributes of object
-                    SongChoice song = new SongChoice();
-                    song.File = fileUri;
-                    song.Name = file.Tag.Title;
-                    song.Album = file.Tag.Album;
-                    song.Length = roundedDuration.ToString();
-                    song.Artist = file.Tag.FirstAlbumArtist;
+        //            // Create new SongChoice object and assigns values gained to attributes of object
+        //            SongChoice song = new SongChoice();
+        //            song.File = fileUri;
+        //            song.Name = file.Tag.Title;
+        //            song.Album = file.Tag.Album;
+        //            song.Length = roundedDuration.ToString();
+        //            song.Artist = file.Tag.FirstAlbumArtist;
 
-                    // Adds new song to input list
-                    inputList = song.AddSongs(inputList);
-                    DownloadBar.Value++;
-                }
-            }
+        //            // Adds new song to input list
+        //            inputList = song.AddSongs(inputList);
+        //            DownloadBar.Value++;
+        //        }
+        //    }
 
-            return inputList;
-        }
+        //    return inputList;
+        //}
 
         private void BrowseButton_Click(object sender, RoutedEventArgs e)
         {

@@ -25,8 +25,10 @@ namespace ProjectDesign
             InitializeComponent();
         }
 
+        // When return button clicked
         private void Return_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
+            // Return to login page
             LoginPage newPage = new LoginPage();
             Window currentWin = (Window)this.Parent;
             currentWin.Content = newPage;

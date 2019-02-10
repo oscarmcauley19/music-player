@@ -37,6 +37,7 @@ namespace ProjectDesign
                 string username = UsernameInput.Text;
                 string hashedPassword = PasswordEncrypter.Hash(PasswordInput.Password);
 
+                // Establish connection from details held in connection string
                 MySqlConnection connection = new MySqlConnection(connectionString);
                 
                 // Create command with values from parameters
@@ -64,17 +65,9 @@ namespace ProjectDesign
                 string userID = reader[0].ToString();
                 connection.Close();
 
-                // FTP request to upload file to user location in server
-                string folderPath = Properties.Settings.Default.FTPAddress + "/user_" + userID;
-                WebRequest request = WebRequest.Create(folderPath);
-                request.Method = WebRequestMethods.Ftp.MakeDirectory;
-                request.Credentials = new NetworkCredential(Properties.Settings.Default.FTPUsername, Properties.Settings.Default.FTPPassword);
-
-                // Output confirmation (testing)
-                //using (var resp = (FtpWebResponse)request.GetResponse())
-                //{
-                //    MessageBox.Show(resp.StatusCode.ToString());
-                //}
+                // FTP request to create folder for user in server
+                CreateFolder(Properties.Settings.Default.FTPAddress, userID,
+                    Properties.Settings.Default.FTPUsername, Properties.Settings.Default.FTPPassword);
 
                 return true;
             }
@@ -85,7 +78,7 @@ namespace ProjectDesign
                 {
                     MessageBox.Show("This account already exists.");
                 }
-                else
+                else // General error code if other issue
                 {
                     MessageBox.Show("Error creating account.");
                 }
@@ -93,27 +86,50 @@ namespace ProjectDesign
             }
         }
 
+        private void CreateFolder(string ftpPath, string ID, string username, string pword)
+        {
+            // FTP request to upload file to user location in server
+            string folderPath = Properties.Settings.Default.FTPAddress + "/user_" + ID;
+            WebRequest request = WebRequest.Create(folderPath);
+            request.Method = WebRequestMethods.Ftp.MakeDirectory;
+            request.Credentials = new NetworkCredential(username, pword);
+
+            // Output confirmation (testing)
+            //using (var resp = (FtpWebResponse)request.GetResponse())
+            //{
+            //    MessageBox.Show(resp.StatusCode.ToString());
+            //}
+        }
+
+        // When 'go to login page' button clicked
         private void LogIn_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-
+            // Switch to login page
             LoginPage newPage = new LoginPage();
             Window currentWin = (Window)this.Parent;
             currentWin.Content = newPage;
         }
 
+        // When submit button is clicked
         private void SubmitButtonLogin_Click(object sender, RoutedEventArgs e)
         {
+            // Check length criteria for username
             if (UsernameInput.Text.Length < 13 && UsernameInput.Text.Length > 2)
             {
+                // Same for password
                 if (PasswordInput.Password.Length < 16 && PasswordInput.Password.Length > 7)
                 {
+                    // Check pword contains number
                     bool containsNum = PasswordInput.Password.Any(c => char.IsDigit(c));
                     if (containsNum)
                     {
+                        // Finally check password repeat is actually correct
                         if (PasswordInput.Password == PasswordCheck.Password)
                         {
+                            // If upload of details has been successful
                             if (DetailsToDB())
                             {
+                                // Switch to sign up confirmation page
                                 SignUpConfirmationPage confPage = new SignUpConfirmationPage();
                                 Window currentWin = (Window)this.Parent;
                                 currentWin.Content = confPage;

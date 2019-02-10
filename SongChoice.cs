@@ -12,14 +12,9 @@ namespace ProjectDesign
 {
     public class SongChoice : INotifyPropertyChanged
     {
-        //sets attributes based on parameters passed through
-
-        public Uri fileValue;
-        public Uri File {
-            get { return fileValue; }
-            set { fileValue = value; }
-        }
-
+        // These attributes are ALL PRIVATE - this is shorthand
+        // way of writing get-set methods in C#
+        public Uri File { get; set; }
         public string Name { get; set; }
         public string Length { get; set; }
         public string Album { get; set; }
@@ -27,12 +22,12 @@ namespace ProjectDesign
         public ImageSource Picture { get; set; }
 
         //method for adding songs to a list that's passed through
-        public List<SongChoice> AddSongs(List<SongChoice> inputList)
-        {
-            inputList.Add(new SongChoice() { File = this.File, Name = this.Name, Artist = this.Artist, Album = this.Album, Length = this.Length, Picture = this.Picture});
-            //adds new song object using values already defined
-            return inputList;
-        }
+        //public List<SongChoice> AddSongs(List<SongChoice> inputList)
+        //{
+        //    inputList.Add(new SongChoice() { File = this.File, Name = this.Name, Artist = this.Artist, Album = this.Album, Length = this.Length, Picture = this.Picture});
+        //    //adds new song object using values already defined
+        //    return inputList;
+        //}
 
         public event PropertyChangedEventHandler PropertyChanged;
 

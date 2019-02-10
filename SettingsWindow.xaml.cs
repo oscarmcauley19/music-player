@@ -20,11 +20,19 @@ namespace ProjectDesign
     /// </summary>
     public partial class SettingsWindow : Window
     {
+        // saveAccount is actually private
+        // This is shorthand way of making get-set methods
+        // in C#
+        public bool saveAccount { get; set; }
+
         public SettingsWindow()
         {
             InitializeComponent();
+
+            // Fill path box with predefined one if already set
             DefaultPathBox.Text = Properties.Settings.Default.DefaultPath;
 
+            // Tick box if user has already chosen to be remembered
             if(Properties.Settings.Default.RememberUser == true)
             {
                 RememberCB.IsChecked = true;
@@ -35,27 +43,38 @@ namespace ProjectDesign
             }
         }
 
-        bool _saveAccount;
-        public bool saveAccount
-        {
-            get { return _saveAccount; }
-            set { _saveAccount = value; }
-        }
-
+        // saveAccount is true when box is checked
         private void CheckBox_Checked(object sender, RoutedEventArgs e)
         {
             saveAccount = true;
         }
 
+        // saveAccount is false when box is unchecked
         private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
         {
             saveAccount = false;
         }
 
+        // When browse button clicked
+        private void BrowseButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Open folder browsing dialog
+            VistaFolderBrowserDialog dlg = new VistaFolderBrowserDialog();
+            dlg.ShowNewFolderButton = true;
+            dlg.ShowDialog();
+
+            // Get chosen path and output
+            DefaultPathBox.Text =  dlg.SelectedPath;
+        }
+
+        // When save button clicked
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
+            // Specified path saved in settings for future sessions
             Properties.Settings.Default.DefaultPath = DefaultPathBox.Text;
-            if (RememberCB.IsChecked == true && User.username != null)
+
+            // If user chose to be remembered & is actually logged in
+            if (saveAccount && User.username != null)
             {
                 //User will be remembered when program opened
                 Properties.Settings.Default.RememberUser = true;
@@ -68,16 +87,6 @@ namespace ProjectDesign
             }
             //Close window
             this.Close();
-        }
-
-        private void BrowseButton_Click(object sender, RoutedEventArgs e)
-        {
-            VistaFolderBrowserDialog dlg = new VistaFolderBrowserDialog();
-            dlg.ShowNewFolderButton = true;
-            dlg.ShowDialog();
-
-            // Get chosen path and output
-            DefaultPathBox.Text =  dlg.SelectedPath;
         }
     }
 }

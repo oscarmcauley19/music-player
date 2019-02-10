@@ -4,21 +4,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ProjectDesign"
-        xmlns:viewmodels="clr-namespace:ProjectDesign.ViewModels"
-        xmlns:views="clr-namespace:ProjectDesign.Views"
         xmlns:properties="clr-namespace:ProjectDesign.Properties"
         mc:Ignorable="d"
         Title="MainWindow" Height="600" Width="800" Closing="Window_Closing">
     <Window.Resources>
-        <DataTemplate x:Name="SongsViewTemplate" DataType="{x:Type viewmodels:SongsViewModel}">
-            <views:SongsView DataContext="{Binding}"/>
-        </DataTemplate>
-        <DataTemplate x:Name="ArtistsViewTemplate" DataType="{x:Type viewmodels:ArtistsViewModel}">
-            <views:ArtistsView DataContext="{Binding}"/>
-        </DataTemplate>
-        <DataTemplate x:Name="AlbumsViewTemplate" DataType="{x:Type viewmodels:AlbumsViewModel}">
-            <views:AlbumsView DataContext="{Binding}"/>
-        </DataTemplate>
 
         <Style TargetType="{x:Type DataGridColumnHeader}">
             <Setter Property="Height" Value="35" />

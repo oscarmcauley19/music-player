@@ -20,8 +20,6 @@ using System.Windows.Threading;
 using Renci.SshNet;
 using Renci.SshNet.Sftp;
 using MySql.Data.MySqlClient;
-using ProjectDesign.ViewModels;
-using ProjectDesign.Views;
 using System.Diagnostics;
 using Microsoft.Win32;
 using System.Windows.Controls.Primitives;
