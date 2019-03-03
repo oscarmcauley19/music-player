@@ -678,7 +678,7 @@ namespace ProjectDesign
         private void DownloadButton_Click(object sender, RoutedEventArgs e)
         {
             // Open download window
-            DownloadPage newwin = new DownloadPage();
+            DownloadWindow newwin = new DownloadWindow();
             newwin.Show();
         }
 

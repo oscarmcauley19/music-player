@@ -28,7 +28,7 @@ namespace ProjectDesign
     /// Interaction logic for DownloadPage.xaml
     /// </summary>
     /// 
-    public partial class DownloadPage : Window, INotifyPropertyChanged
+    public partial class DownloadWindow : Window, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -38,7 +38,7 @@ namespace ProjectDesign
                 PropertyChanged(this, new PropertyChangedEventArgs(name));
         }
 
-        public DownloadPage()
+        public DownloadWindow()
         {
             InitializeComponent();
 
