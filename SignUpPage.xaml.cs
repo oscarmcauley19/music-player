@@ -94,11 +94,11 @@ namespace ProjectDesign
             request.Method = WebRequestMethods.Ftp.MakeDirectory;
             request.Credentials = new NetworkCredential(username, pword);
 
-            // Output confirmation (testing)
-            //using (var resp = (FtpWebResponse)request.GetResponse())
-            //{
-            //    MessageBox.Show(resp.StatusCode.ToString());
-            //}
+            // Get response
+            using (var resp = (FtpWebResponse)request.GetResponse())
+            {
+                //MessageBox.Show(resp.StatusCode.ToString());
+            }
         }
 
         // When 'go to login page' button clicked
