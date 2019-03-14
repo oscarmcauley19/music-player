@@ -19,8 +19,8 @@
                 <RowDefinition Height="30"/>
 
             </Grid.RowDefinitions>
-            <TextBlock Grid.Row="0" Text="L O G I N" FontFamily="Segoe UI Light" Foreground="White" FontSize="25" Margin="20, 10"/>
-            <TextBlock Grid.Row="1" Text="Enter your account details below:" FontFamily="Segoe UI Light" Foreground="White" Margin="20, 0, 0, 0"/>
+            <TextBlock Grid.Row="0" Text="S I G N  U P" FontFamily="Segoe UI Light" Foreground="White" FontSize="25" Margin="20, 10"/>
+            <TextBlock Grid.Row="1" Text="Enter your account details below:" FontFamily="Segoe UI Light" Foreground="White" Margin="20, 0, 20, 0"/>
             <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="20, 0, 0, 20">
                 <TextBlock Text="Username:"  FontFamily="Segoe UI Light" Foreground="White" Width="70"/>
                 <TextBox Name="UsernameInput" Margin="0, 0, 20, 0" Width="200" ToolTip="Must be minimum 3 characters, maximum 12 characters" Height="20" HorizontalAlignment="Left"/>
