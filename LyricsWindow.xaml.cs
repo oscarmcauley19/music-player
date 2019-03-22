@@ -28,6 +28,8 @@ namespace ProjectDesign
     /// </summary>
     public partial class LyricsWindow : Window
     {
+		// Because of how classes work in WPF, these need to be public
+		// in order for methods to access them
         public SongChoice Song { get; set; }
         public int artistArticleNo = 1;
         public int albumArticleNo = 1;

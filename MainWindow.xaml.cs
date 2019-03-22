@@ -184,8 +184,8 @@ namespace ProjectDesign
             //create URI object - will allow for songs to actually be played
             Uri fileUri = new Uri(@filepath);
 
-            //Use TagLib extension to gain control of metadata values
-            TagLib.File file = TagLib.File.Create(filepath);
+			//Use TagLib extension to gain control of metadata values
+			TagLib.File file = TagLib.File.Create(filepath);
 
             //round the value for duration and change format to minutes & seconds
             TimeSpan duration = file.Properties.Duration;
@@ -199,8 +199,17 @@ namespace ProjectDesign
                 File = fileUri //sets the actual file as an attribute so is linked to info displayed on grid
             };
 
-            // Change nulls to string values for sorting later
-            if (file.Tag.Title == null) { song.Name = ""; }
+            // If it doesn't have a title
+            if (file.Tag.Title == null)
+			{
+				//Set title to file name - removes .mp3 from end
+				string filename = System.IO.Path.GetFileName(@filepath);
+				if (filename.EndsWith(".mp3"))
+				{
+					filename = filename.Remove(filename.Length - 4, 4);
+				}
+				song.Name = filename;
+			}
             else { song.Name = file.Tag.Title; }
             if (file.Tag.Album == null) { song.Album = ""; }
             else { song.Album = file.Tag.Album; }
@@ -291,7 +300,8 @@ namespace ProjectDesign
                     current = nextSong;
                     // Play new song
                     Mp3Player.Source = current.File;
-                    return current;
+					UpdateArtAndDiscoverButton(current);
+					return current;
                 }
                 else if (mode == "prev")
                 {
@@ -300,7 +310,8 @@ namespace ProjectDesign
                     current = prevSong;
                     // Play new song
                     Mp3Player.Source = current.File;
-                    return current;
+					UpdateArtAndDiscoverButton(current);
+					return current;
                 }
                 else
                 {
@@ -309,8 +320,10 @@ namespace ProjectDesign
                     Mp3Player.Source = current.File; //refreshes Mp3Player
                     Mp3Player.Play(); //Play song
                     PausePlayButton.Content = ";";
-                    return current;
+					UpdateArtAndDiscoverButton(current);
+					return current;
                 }
+
             }
             // if indexing error occurs
             catch
@@ -326,19 +339,36 @@ namespace ProjectDesign
                     current = Queue.GetList()[0];
                 }
                 Mp3Player.Source = current.File;
-                return current;
-            }
-            // Collapse image element if no art
-            if (current.Album != null || current.Artist != null)
-            {
-                AlbumArt.Visibility = Visibility.Visible;
-                LyricsButton.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                AlbumArt.Visibility = Visibility.Collapsed;
+				UpdateArtAndDiscoverButton(current);
+				return current;
             }
         }
+
+		private void UpdateArtAndDiscoverButton(SongChoice song)
+		{
+			// If current song has an artist or album attributed to it
+			if (song.Album != "" || song.Artist != "")
+			{
+				// Make Discover button visible
+				LyricsButton.Visibility = Visibility.Visible;
+			}
+			else
+			{
+				// Make Discover button invisible
+				LyricsButton.Visibility = Visibility.Collapsed;
+			}
+			// If song has art
+			if (song.Picture != null)
+			{
+				// Make art visible
+				AlbumArt.Visibility = Visibility.Visible;
+			}
+			else
+			{
+				// Make art invisible
+				AlbumArt.Visibility = Visibility.Collapsed;
+			}
+		}
 
         //private void playNext()
         //{
